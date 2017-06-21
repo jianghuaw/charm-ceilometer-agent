@@ -82,3 +82,31 @@ class CeilometerServiceContext(OSContextGenerator):
                             conf['rabbit_ssl_ca'] = ca_path
                     return conf
         return {}
+
+
+class CeilometerComputeContext(OSContextGenerator):
+    interfaces = ['nova-ceilometer']
+    keys = [
+        'virt_type',
+    ]
+
+    optional_keys = [
+        'host_ip',
+        'host_username',
+        'host_password',
+    ]
+
+    def __call__(self):
+        for relid in relation_ids('nova-ceilometer'):
+            for unit in related_units(relid):
+                conf = {}
+                for attr in self.keys:
+                    conf[attr] = relation_get(
+                        attr, unit=unit, rid=relid)
+                if context_complete(conf):
+                    virt_type = conf.get('virt_type')
+                    if virt_type is not None and virt_type == 'xenapi':
+                        for attr in self.optional_keys:
+                            conf[attr] = relation_get(attr, unit=unit, rid=relid)
+                    return conf
+        return {}

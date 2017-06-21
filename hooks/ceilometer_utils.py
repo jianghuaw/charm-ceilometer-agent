@@ -19,6 +19,7 @@ from charmhelpers.contrib.openstack import (
 )
 from ceilometer_contexts import (
     CeilometerServiceContext,
+    CeilometerComputeContext,
 )
 from charmhelpers.contrib.openstack.utils import (
     get_os_codename_package,
@@ -74,6 +75,7 @@ CONFIG_FILES = {
     CEILOMETER_CONF: {
         'hook_contexts': [
             CeilometerServiceContext(ssl_dir=CEILOMETER_CONF_DIR),
+            CeilometerComputeContext(),
             context.InternalEndpointContext(),
             context.MemcacheContext()],
         'services': CEILOMETER_AGENT_SERVICES
